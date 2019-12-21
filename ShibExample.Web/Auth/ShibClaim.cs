@@ -10,8 +10,6 @@ namespace ShibExample.Web.Auth
     {
         private readonly List<Claim> _userClaims;
         private const string issuer = "https://www.YOURISSUER.edu";
-        private List<string> _groups;
-
         public ShibClaim()
         {
             this._userClaims = new List<Claim>();
