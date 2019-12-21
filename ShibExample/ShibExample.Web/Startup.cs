@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -31,6 +32,24 @@ namespace ShibExample.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddRouting(options => options.AppendTrailingSlash = true);
+            services.AddRouting(options => options.LowercaseUrls = true);
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = new PathString("/auth/login");
+                    options.LogoutPath = new PathString("/auth/logout");
+                    options.AccessDeniedPath = new PathString("/auth/unauthorized/");
+                });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminAccess", policy => policy.RequireClaim("Admin"));
+            });
+
+            var appSettings = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettings);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
